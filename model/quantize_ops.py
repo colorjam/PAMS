@@ -183,9 +183,9 @@ class activation_quantize(nn.Module):
 
     return activation_q
 
-class pact_activation_quantize(nn.Module):
+class pams_quant_act(nn.Module):
   def __init__(self, k_bits,mode='linear',version=1,name='resnet', ema_epoch=1):
-    super(pact_activation_quantize, self).__init__()
+    super(pams_quant_act, self).__init__()
     # assert k_bits % 2 ==0
     self.deacy = 0.9997
     self.k_bits = k_bits
@@ -334,10 +334,3 @@ def quant_conv3x3_withbn(in_channels, out_channels, stride=1,mode='linear',k_bit
     Conv= QuantConv2d_WithBN(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride = stride,padding=1 ,mode=mode,k_bit=k_bits)
     return Conv
 
-def quant_linear(in_channels,out_channels,mode='linear',k_bits=32):
-    Linear = QuantLinear(in_channels,out_channels,mode=mode,k_bits=k_bits)
-    return Linear
-
-def quant_linear_withbn(in_channels,out_channels,mode='linear',k_bits=32):
-    Linear = QuantLinear_WithBN(in_channels,out_channels,bias=False,mode=mode,k_bits=k_bits)
-    return Linear

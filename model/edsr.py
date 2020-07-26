@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import time
 
-from model.quantize_ops import activation_quantize,quant_conv3x3,quant_conv3x3_withbn,conv3x3,pact_activation_quantize
+from model.quantize_ops import activation_quantize,quant_conv3x3,conv3x3,pact_activation_quantize
 
 __all__ =['edsr']
 
@@ -63,7 +63,7 @@ class BasicResBlock(nn.Module):
 
 class ResBlock(nn.Module):
     def __init__(self, conv, n_feats, kernel_size,bias=False, 
-                bn=False, act=nn.ReLU(False), res_scale=1, mode= 'max',k_bits = 32,version =1,name=None,num = None):
+                bn=False, act=nn.ReLU(False), res_scale=1, mode= 'max',k_bits=32,version=1,name=None,num = None):
         super(ResBlock, self).__init__()
         self.mode = mode
         self.k_bits = k_bits
@@ -77,10 +77,7 @@ class ResBlock(nn.Module):
         self.shortcut = ShortCut()
         m = []
         for i in range(2):
-            if bn:
-                m.append(quant_conv3x3_withbn(n_feats,n_feats,stride=1,mode=mode,k_bits=self.k_bits))
-            else:
-                m.append(conv(n_feats,n_feats,kernel_size,mode=mode,k_bits=self.k_bits,bias = bias))
+            m.append(conv(n_feats,n_feats,kernel_size,mode=mode,k_bits=self.k_bits,bias = bias))
             if i == 0: 
                 m.append(act)
                 m.append(self.activation2)
@@ -99,11 +96,11 @@ class ResBlock(nn.Module):
         return res
 
 
-class Pact_ResBlock(nn.Module):
+class PAMS_ResBlock(nn.Module):
     def __init__(self, conv, n_feats, kernel_size,bias=False, 
                 bn=False, act=nn.ReLU(False), res_scale=1,mode= 'max',k_bits = 32,version =1,name=None,num=None,ema_epoch=1):
 
-        super(Pact_ResBlock, self).__init__()
+        super(PAMS_ResBlock, self).__init__()
         self.mode = mode
         self.k_bits = k_bits
         self.version = version 
@@ -191,7 +188,7 @@ class EDSR_PAMS(nn.Module):
         m_head = [conv3x3(args.n_colors, n_feats, kernel_size,1, bias=bias)]
         # define body module
         m_body = [
-            Pact_ResBlock(
+            PAMS_ResBlock(
                 conv, n_feats, kernel_size, act=act, res_scale=args.res_scale,
                 mode=self.mode, k_bits=self.k_bits, version=self.version, name=self.name,num=i,bias = bias,ema_epoch=args.ema_epoch
             ) for i in range(n_resblock)

@@ -1,26 +1,26 @@
-import torch
+import json
 import math
+import pdb
 from decimal import Decimal
-import utility
+
+import cv2
+import torch
+import torch.nn.functional as F
+import torch.nn.utils as utils
+from tensorboardX import SummaryWriter
+from torch.optim.lr_scheduler import StepLR
+from tqdm import tqdm
+
 import data
 import model
-import torch
-from option import args
-import torch.nn.utils as utils
+import utility
 from model.edsr import EDSR_PAMS
 from model.edsr_org import EDSR
 from model.rdn import RDN_PAMS
 from model.rdn_org import RDN
-from tqdm import tqdm
+from option import args
 from utils import common as util
-import torch.nn.functional as F
 from utils.common import AverageMeter
-from tensorboardX import SummaryWriter
-from torch.optim.lr_scheduler import MultiStepLR, StepLR
-from model.quantize_ops import pact_activation_quantize
-import json 
-import pdb 
-import cv2
 
 torch.manual_seed(args.seed)
 checkpoint = utility.checkpoint(args)
@@ -55,7 +55,7 @@ class Trainer():
             self.sheduler.load_state_dict(ckpt['scheduler'])
 
         self.losses = AverageMeter()
-        # self.att_losses = AverageMeter()
+        self.att_losses = AverageMeter()
         self.nor_losses = AverageMeter()
 
     def train(self):
@@ -68,7 +68,7 @@ class Trainer():
             '[Epoch {}]\tLearning rate: {:.2e}'.format(self.epoch, Decimal(lr))
         )
 
-        # self.t_model.eval()
+        self.t_model.eval()
         self.s_model.train()
         
         self.s_model.apply(lambda m: setattr(m, 'epoch', self.epoch))
@@ -87,22 +87,15 @@ class Trainer():
 
             self.optimizer.zero_grad()
 
-            # if hasattr(self.t_model, 'set_scale'):
-            #     self.t_model.set_scale(idx_scale)
             if hasattr(self.s_model, 'set_scale'):
                 self.s_model.set_scale(idx_scale)
 
-            # with torch.no_grad():
-            #     t_sr, t_res = self.t_model(lr)
             s_sr, s_res = self.s_model(lr)
 
             nor_loss = args.w_l1 * F.l1_loss(s_sr, hr)
-            # att_loss = args.w_at * util.at_loss(s_res, t_res)
+            att_loss = args.w_at * util.at_loss(s_res, t_res)
 
-            loss = nor_loss 
-
-            # self.att_losses.update(att_loss.item(),data_size)
-            self.nor_losses.update(nor_loss.item(),data_size)
+            loss = nor_loss  + att_loss
 
             self.losses.update(loss.item(),data_size)
 
@@ -229,29 +222,17 @@ def main():
         else:
             raise ValueError('not expected model = {}'.format(args.model))
 
-        pre_train_ckpt = torch.load(args.pre_train) 
-        t_model.load_state_dict(pre_train_ckpt)
-
+        t_checkpoint = torch.load(args.pre_train) 
+        t_model.load_state_dict(t_checkpoint)
         s_model_sd = s_model.state_dict()
         
-        # if args.model.lower() == 'edsr':
-        #     new_sd = {}
-        #     for k, v in pre_train_ckpt.items():
-        #         new_k = k
-        #         if '.body.2.weight' in k or '.body.2.bias':
-        #             new_k = new_k.replace('.body.2', '.body.3')
-        #         new_sd[new_k] = v
-        #     s_model_sd.update(new_sd)
-
-        # s_model.load_state_dict(s_model_sd)
-    
         if args.test_only:
             if args.refine is not None:
                 ckpt = torch.load(f'../experiment/{args.save}/model/model_best.pth.tar')
             else:
                 ckpt = torch.load(f'{args.refine}')
-            sd = ckpt['state_dict']
-            s_model.load_state_dict(sd)
+            s_checkpoint = ckpt['state_dict']
+            s_model.load_state_dict(s_checkpoint)
 
         t = Trainer(args, loader, t_model, s_model, checkpoint)
         
@@ -265,4 +246,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

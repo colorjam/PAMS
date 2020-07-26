@@ -22,18 +22,15 @@ class Model(nn.Module):
         self.save_models = args.save_models
 
         module = import_module('model.' + args.model.lower())
-        # print(args.model)
         self.model = module.make_model(args).cuda()
         if args.precision == 'half':
             self.model.half()
-        # print(args.resume)
         self.load(
             ckp.get_path('model'),
             pre_train=args.pre_train,
             resume=args.resume,
             cpu=args.cpu
         )
-        # print(self.model, file=ckp.log_file)
 
     def forward(self, x, idx_scale):
         self.idx_scale = idx_scale
@@ -70,7 +67,6 @@ class Model(nn.Module):
             torch.save(self.model.state_dict(), s)
 
     def load(self, apath, pre_train='', resume=-1, cpu=False):
-        # print(pre_train)
         load_from = None
         kwargs = {}
         if cpu:
@@ -98,10 +94,6 @@ class Model(nn.Module):
                 load_from = torch.load(pre_train, **kwargs)
         else:
             load_from = torch.load(resume)
-            # load_from = torch.load(
-                # os.path.join(apath, 'model_{}.pt'.format(resume)),
-                # **kwargs
-            # )
         
         if load_from:
             print('strcit is False')
