@@ -75,13 +75,8 @@ parser.add_argument('--dilation', action='store_true',
 parser.add_argument('--precision', type=str, default='single',
                     choices=('single', 'half'),
                     help='FP precision for test (single | half)')
-parser.add_argument('--mode', type=str, default='max',
-                    choices=('linear','max','tanh','log2','gaussian','google', 'dorefa'),
-                    help='The mode of the quantize')
 parser.add_argument('--k_bits', type=int, default=32,
                     help='The k_bits of the quantzie')
-parser.add_argument('--version', type=int, default=3,
-                    help='The Version of Computing The MAX Value Of Feature MAP')
 
 # Option for Residual dense network (RDN)
 parser.add_argument('--G0', type=int, default=64,

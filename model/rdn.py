@@ -2,37 +2,28 @@
 import torch
 import torch.nn as nn
 import torch.nn.parallel as P
-from model.quantize_ops import quant_conv3x3, activation_quantize, quant_conv3x3_withbn,pact_activation_quantize,QuantConv2d
-import pdb
-__all__ = ['rdn']
 
-def make_model(args, parent=False):
-    return RDN(args)
+from model import common
+from model.quant_ops import conv3x3
+from model.quant_ops import pams_quant_act
+from model.quant_ops import quant_conv3x3
+from model.quant_ops import QuantConv2d
 
-class ShortCut(nn.Module):
-    def __init__(self):
-        super(ShortCut, self).__init__()
-
-    def forward(self, input):
-        return input
-
-class Pact_RDB_Conv(nn.Module):
-    def __init__(self, inChannels, growRate, kSize=3,k_bits=32,mode = 'max',version = 3,name = None):
-        super(Pact_RDB_Conv, self).__init__()
+class PAMS_RDB_Conv(nn.Module):
+    def __init__(self, inChannels, growRate, kSize=3, k_bits=32):
+        super(PAMS_RDB_Conv, self).__init__()
         Cin = inChannels
         G  = growRate
 
         self.k_bits = k_bits
-        self.mode = mode
-        self.version = version
 
         self.conv = nn.Sequential(*[
-            quant_conv3x3(Cin, G, kSize, padding=(kSize-1)//2, stride =1, mode = self.mode, k_bits= self.k_bits, bias = True),
+            quant_conv3x3(Cin, G, kSize, padding=(kSize-1)//2, stride =1, k_bits= self.k_bits, bias = True),
             nn.ReLU()
         ])
         
-        self.act1 = pact_activation_quantize(self.k_bits, self.mode, self.version, name)
-        self.act2 = pact_activation_quantize(self.k_bits, self.mode, self.version, name)
+        self.act1 = pams_quant_act(self.k_bits)
+        self.act2 = pams_quant_act(self.k_bits)
         
     def forward(self, x):
         x1 = self.act1(x)
@@ -40,22 +31,20 @@ class Pact_RDB_Conv(nn.Module):
 
         return torch.cat((x1, out), 1)
 
-class Pact_RDB_Conv_in(nn.Module):
-    def __init__(self, inChannels, growRate, kSize=3, k_bits=32, mode = 'max', version = 3,name = None):
-        super(Pact_RDB_Conv_in, self).__init__()
+class PAMS_RDB_Conv_in(nn.Module):
+    def __init__(self, inChannels, growRate, kSize=3, k_bits=32, name = None):
+        super(PAMS_RDB_Conv_in, self).__init__()
         Cin = inChannels
         G  = growRate
 
         self.k_bits = k_bits
-        self.mode = mode
-        self.version = version
 
         self.conv = nn.Sequential(*[
-            quant_conv3x3(Cin, G, kSize, padding=(kSize-1)//2, stride = 1, mode = self.mode, k_bits= self.k_bits, bias = True),
+            quant_conv3x3(Cin, G, kSize, padding=(kSize-1)//2, stride = 1, k_bits= self.k_bits, bias = True),
             nn.ReLU()
         ])
         
-        self.act = pact_activation_quantize(self.k_bits, self.mode, self.version, name)
+        self.act = pams_quant_act(self.k_bits)
         
     def forward(self, x, i):
         if i > 0:
@@ -64,27 +53,25 @@ class Pact_RDB_Conv_in(nn.Module):
 
         return torch.cat((x, out), 1)
 
-class Pact_RDB(nn.Module):
-    def __init__(self, growRate0, growRate, nConvLayers, kSize=3, k_bits=32, mode = 'max', version = 3,name= None):
-        super(Pact_RDB, self).__init__()
+class PAMS_RDB(nn.Module):
+    def __init__(self, growRate0, growRate, nConvLayers, kSize=3, k_bits=32, name= None):
+        super(PAMS_RDB, self).__init__()
         G0 = growRate0
         G  = growRate
         C  = nConvLayers
 
         self.k_bits = k_bits
-        self.mode = mode
-        self.version = version
 
         convs = []
         for c in range(C):
-            convs.append(Pact_RDB_Conv_in(G0 + c*G, G,kSize ,k_bits = self.k_bits,mode= self.mode,version = self.version,name = name))
+            convs.append(PAMS_RDB_Conv_in(G0 + c*G, G,kSize ,k_bits =self.k_bits))
         self.convs = nn.Sequential(*convs)
         
-        self.act1 = pact_activation_quantize(self.k_bits, self.mode, self.version)
-        self.act2 = pact_activation_quantize(self.k_bits, self.mode, self.version)
+        self.act1 = pams_quant_act(self.k_bits)
+        self.act2 = pams_quant_act(self.k_bits)
 
         # Local Feature Fusion
-        self.LFF = QuantConv2d(in_channels=G0 + C*G, out_channels=G0, kernel_size=1, padding=0, mode=self.mode,k_bits=self.k_bits, stride=1, bias=True)
+        self.LFF = QuantConv2d(in_channels=G0 + C*G, out_channels=G0, kernel_size=1, padding=0,k_bits=self.k_bits, stride=1, bias=True)
 
     def forward(self, x):
         x = self.act1(x)
@@ -97,15 +84,12 @@ class Pact_RDB(nn.Module):
     def name(self):
         return 'rdb'
 
-class RDN_PAMS(nn.Module):
+class PMAS_RDN(nn.Module):
     def __init__(self,args):
-        super(RDN_PAMS, self).__init__()
+        super(PMAS_RDN, self).__init__()
         r = args.scale[0]
         G0 = args.G0
         kSize = args.RDNkSize
-        self.mode = args.mode
-        self.version = args.version
-        # print(self.version)
 
         # number of RDB blocks, conv layers, out channels
         self.D, C, G = {
@@ -125,15 +109,15 @@ class RDN_PAMS(nn.Module):
         self.RDBs = nn.ModuleList()
         for i in range(self.D):
             self.RDBs.append(
-                Pact_RDB(growRate0 = G0, growRate = G, nConvLayers = C, mode = self.mode, k_bits=args.k_bits,version=self.version, name = self.name)
+                PAMS_RDB(growRate0 = G0, growRate = G, nConvLayers = C, k_bits=args.k_bits)
             )
 
-        self.act = pact_activation_quantize(args.k_bits, self.mode, self.version)
+        self.act = pams_quant_act(args.k_bits)
 
         # Global Feature Fusion
         self.GFF = nn.Sequential(*[
-            QuantConv2d(self.D * G0, G0, 1, padding=0, stride=1, mode=self.mode, k_bits=args.k_bits,bias=True),
-            QuantConv2d(G0, G0, kSize, padding=(kSize-1)//2, stride=1,mode=self.mode, k_bits=args.k_bits,bias=True)
+            QuantConv2d(self.D * G0, G0, 1, padding=0, stride=1, k_bits=args.k_bits, bias=True),
+            QuantConv2d(G0, G0, kSize, padding=(kSize-1)//2, stride=1,k_bits=args.k_bits, bias=True)
         ])
 
         # Up-sampling net
@@ -162,7 +146,6 @@ class RDN_PAMS(nn.Module):
             x = self.RDBs[i](x)
             RDBs_out.append(x)
 
-        # pdb.set_trace()
         x = self.GFF(self.act(torch.cat(RDBs_out, 1)))
         x += f__1
 

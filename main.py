@@ -14,9 +14,9 @@ from tqdm import tqdm
 import data
 import model
 import utility
-from model.edsr import EDSR_PAMS
+from model.edsr import PMAS_EDSR
 from model.edsr_org import EDSR
-from model.rdn import RDN_PAMS
+from model.rdn import PMAS_RDN
 from model.rdn_org import RDN
 from option import args
 from utils import common as util
@@ -215,10 +215,10 @@ def main():
         loader = data.Data(args)
         if args.model.lower() == 'edsr':
             t_model = EDSR(args, is_teacher=True).to(device)
-            s_model = EDSR_PAMS(args, bias=True).to(device)
+            s_model = PMAS_EDSR(args, bias=True).to(device)
         elif args.model.lower() == 'rdn':
             t_model = RDN(args, is_teacher=True).to(device)
-            s_model = RDN_PAMS(args).to(device)
+            s_model = PMAS_RDN(args).to(device)
         else:
             raise ValueError('not expected model = {}'.format(args.model))
 

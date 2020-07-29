@@ -5,17 +5,6 @@ from model import common
 
 import torch
 import torch.nn as nn
-import pdb
-
-def make_model(args, parent=False):
-    return RDN(args)
-
-class ShortCut(nn.Module):
-    def __init__(self):
-        super(ShortCut, self).__init__()
-
-    def forward(self, input):
-        return input
 
 class RDB_Conv(nn.Module):
     def __init__(self, inChannels, growRate, kSize=3):
