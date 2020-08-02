@@ -16,7 +16,6 @@ class PAMS_RDB_Conv(nn.Module):
         G  = growRate
 
         self.k_bits = k_bits
-
         self.conv = nn.Sequential(*[
             quant_conv3x3(Cin, G, kSize, padding=(kSize-1)//2, stride =1, k_bits= self.k_bits, bias = True),
             nn.ReLU()

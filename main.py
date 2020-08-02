@@ -87,23 +87,28 @@ class Trainer():
 
             self.optimizer.zero_grad()
 
+            if hasattr(self.t_model, 'set_scale'):
+                self.t_model.set_scale(idx_scale)
             if hasattr(self.s_model, 'set_scale'):
                 self.s_model.set_scale(idx_scale)
 
+            with torch.no_grad():
+                t_sr, t_res = self.t_model(lr)
             s_sr, s_res = self.s_model(lr)
 
             nor_loss = args.w_l1 * F.l1_loss(s_sr, hr)
             att_loss = args.w_at * util.at_loss(s_res, t_res)
 
             loss = nor_loss  + att_loss
-
-            self.losses.update(loss.item(),data_size)
+            # loss = nor_loss
+            # loss = att_loss
 
             loss.backward()
             self.optimizer.step()
 
             timer_model.hold()
 
+            self.losses.update(loss.item(),data_size)
             display_loss = f'Loss: {self.losses.avg: .3f}'
 
             if (batch + 1) % self.args.print_every == 0:
@@ -228,7 +233,7 @@ def main():
         
         if args.test_only:
             if args.refine is not None:
-                ckpt = torch.load(f'../experiment/{args.save}/model/model_best.pth.tar')
+                ckpt = torch.load(f'{args.save}/model/model_best.pth.tar')
             else:
                 ckpt = torch.load(f'{args.refine}')
             s_checkpoint = ckpt['state_dict']

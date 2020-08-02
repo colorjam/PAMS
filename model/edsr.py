@@ -14,12 +14,10 @@ from model.quant_ops import quant_conv3x3
 
 class PAMS_ResBlock(nn.Module):
     def __init__(self, conv, n_feats, kernel_size, bias=False, 
-                bn=False, act=nn.ReLU(False), res_scale=1, k_bits = 32, ema_epoch=1):
+                bn=False, act=nn.ReLU(False), res_scale=1, k_bits = 32, ema_epoch=1, name=None):
 
         super(PAMS_ResBlock, self).__init__()
-        self.mode = mode
         self.k_bits = k_bits
-        self.version = version 
 
         self.quant_act1 = pams_quant_act(self.k_bits,ema_epoch=ema_epoch)
         self.quant_act2 = pams_quant_act(self.k_bits, ema_epoch=ema_epoch)
@@ -41,6 +39,7 @@ class PAMS_ResBlock(nn.Module):
         residual = self.quant_act1(self.shortcut(x))
         body = self.body(x).mul(self.res_scale)
         res = self.quant_act3(body)
+        resdual = residual / self.quant_act1.alpha * self.quant_act3.alpha
         res += residual
 
         return res

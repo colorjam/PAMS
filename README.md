@@ -7,8 +7,7 @@ This resposity is the official implementation of our paper. Our implementation i
 * PyTorch >== 1.1.0
 
 ### Datasets
-Prepare datasets according to [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch).
-
+Please download DIV2K datasets from [here](https://cv.snu.ac.kr/research/EDSR/DIV2K.tar) for training and [benchmark datasets](https://cv.snu.ac.kr/research/EDSR/benchmark.tar) for testing.
 
 ### Usage
 
@@ -16,7 +15,7 @@ Prepare datasets according to [EDSR(PyTorch)](https://github.com/thstkdgus35/EDS
 
 ```
 python main.py --scale 4 --k_bits 8 \
---pre_train ../pretrained/edsr_r16f64x4.pt \
+--pre_train ../pretrained/edsr_baseline_x4.pt \
 --data_test Set14 --save edsr_x4/8bit/ \
 --dir_data [DIR_DATA] --model EDSR               
 ```
@@ -59,7 +58,7 @@ refer to `metrics/run.sh` for more details.
 ### Trained Models
 The trained models of getting our paper's results can be download by [Google Drive](https://drive.google.com/open?id=14p3ZBs8VQdHkMWBa5kv_qN7b0w2qJq6c)
 
-### 
+### Citations
 
 
 
