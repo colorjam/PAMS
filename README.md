@@ -35,6 +35,7 @@ python main.py --scale 4 --k_bits 8 \
 More runnig scripts can be found in `run.sh`. 
 
 * PSNR/SSIM
+
 After saving the images, modify path in`metrics/calculate_PSNR_SSIM.m` to generate results.
 
 ```
@@ -60,7 +61,7 @@ The trained models of getting our paper's results can be download by [Google Dri
 
 ### Citations
 
-
+If our paper helps your research, please cite it in your publications:
 
 
 
