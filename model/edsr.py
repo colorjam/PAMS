@@ -39,7 +39,6 @@ class PAMS_ResBlock(nn.Module):
         residual = self.quant_act1(self.shortcut(x))
         body = self.body(x).mul(self.res_scale)
         res = self.quant_act3(body)
-        resdual = residual / self.quant_act1.alpha * self.quant_act3.alpha
         res += residual
 
         return res

@@ -1,2 +1,9 @@
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyc
+
+pretrained/
 /.vscode
-/__pycache__
+
