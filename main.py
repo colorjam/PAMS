@@ -147,7 +147,6 @@ class Trainer():
         for idx_data, d in enumerate(self.loader_test):
             for idx_scale, scale in enumerate(self.scale):
                 d.dataset.set_scale(idx_scale)
-                ssim_list = []
                 i = 0
                 for lr, hr, filename, _ in tqdm(d, ncols=80):
                     i += 1
@@ -215,7 +214,6 @@ class Trainer():
             return self.epoch >= self.args.epochs
 
 def main():
-    import os
     if checkpoint.ok:
         loader = data.Data(args)
         if args.model.lower() == 'edsr':
@@ -227,17 +225,21 @@ def main():
         else:
             raise ValueError('not expected model = {}'.format(args.model))
 
-        t_checkpoint = torch.load(args.pre_train) 
-        t_model.load_state_dict(t_checkpoint)
-        s_model_sd = s_model.state_dict()
+        if args.pre_train is not None:
+            t_checkpoint = torch.load(args.pre_train) 
+            t_model.load_state_dict(t_checkpoint)
         
         if args.test_only:
-            if args.refine is not None:
+            if args.refine is None:
                 ckpt = torch.load(f'{args.save}/model/model_best.pth.tar')
+                refine_path = f'{args.save}/model/model_best.pth.tar'
             else:
                 ckpt = torch.load(f'{args.refine}')
+                refine_path = args.refine
+
             s_checkpoint = ckpt['state_dict']
             s_model.load_state_dict(s_checkpoint)
+            print(f"Load model from {refine_path}")
 
         t = Trainer(args, loader, t_model, s_model, checkpoint)
         

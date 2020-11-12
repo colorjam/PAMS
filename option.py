@@ -21,7 +21,7 @@ parser.add_argument('--seed', type=int, default=1,
 parser.add_argument('--threshld_ratio', type=float, default=1.0,
                     help='random seed')
 # Data specifications
-parser.add_argument('--dir_data', type=str, default='/home/yanchenqian/data/sr_data',
+parser.add_argument('--dir_data', type=str, default='dataset/sr_data',
                     help='dataset image directory')
 parser.add_argument('--dir_demo', type=str, default='../test',
                     help='demo image directory')
@@ -56,7 +56,7 @@ parser.add_argument('--pix_type', default='l1',
                     help='model name')
 parser.add_argument('--act', type=str, default='relu',
                     help='activation function')
-parser.add_argument('--pre_train', type=str, default='',
+parser.add_argument('--pre_train', type=str, default=None,
                     help='pre-trained model directory')
 parser.add_argument('--refine', type=str, default=None,
                     help='refine model directory')
