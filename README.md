@@ -4,7 +4,10 @@ This resposity is the official implementation of our paper. Our implementation i
 
 ### Dependencies
 * Python3.6
-* PyTorch >== 1.1.0
+* PyTorch == 1.1.0
+* Pytorch == 0.3.0
+* coloredlogs >= 14.0
+* scikit-image
 
 ### Datasets
 Please download DIV2K datasets from [here](https://cv.snu.ac.kr/research/EDSR/DIV2K.tar) for training and [benchmark datasets](https://cv.snu.ac.kr/research/EDSR/benchmark.tar) for testing.
@@ -59,10 +62,10 @@ refer to `metrics/run.sh` for more details.
 ### Trained Models
 The trained models of getting our paper's results can be download by [Google Drive](https://drive.google.com/open?id=14p3ZBs8VQdHkMWBa5kv_qN7b0w2qJq6c)
 
+### Qualitative Results
+Some Qualitative Results of PAMS can be download by 
+
 ### Citations
 
 If our paper helps your research, please cite it in your publications:
-
-
-
 

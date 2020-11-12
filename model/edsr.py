@@ -43,9 +43,9 @@ class PAMS_ResBlock(nn.Module):
 
         return res
 
-class PMAS_EDSR(nn.Module):
+class PAMS_EDSR(nn.Module):
     def __init__(self, args, conv=quant_conv3x3, bias = False, k_bits = 32):
-        super(PMAS_EDSR, self).__init__()
+        super(PAMS_EDSR, self).__init__()
 
         n_resblock = args.n_resblocks
         n_feats = args.n_feats

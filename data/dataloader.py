@@ -9,7 +9,7 @@ from torch.utils.data import RandomSampler
 from torch.utils.data import BatchSampler
 from torch.utils.data import _utils
 from torch.utils.data.dataloader import _DataLoaderIter
-import sys
+
 from torch.utils.data._utils import collate
 from torch.utils.data._utils import signal_handling
 from torch.utils.data._utils import MP_STATUS_CHECK_INTERVAL
@@ -18,16 +18,6 @@ from torch.utils.data._utils import IS_WINDOWS
 from torch.utils.data._utils.worker import ManagerWatchdog
 
 from torch._six import queue
-from option import args
-
-
-def prepare(*cfg):
-    # device = torch.device('cpu' if self.args.cpu else f'cuda:{self.args.gpu_id}')
-    def _prepare(tensor):
-        if args.precision == 'half': tensor = tensor.half()
-        return tensor.cuda()
-
-    return [_prepare(a) for a in cfg]
 
 def _ms_loop(dataset, index_queue, data_queue, done_event, collate_fn, scale, seed, init_fn, worker_id):
     try:
@@ -83,7 +73,6 @@ class _MSDataLoaderIter(_DataLoaderIter):
         self.collate_fn = loader.collate_fn
         self.batch_sampler = loader.batch_sampler
         self.num_workers = loader.num_workers
-        # print('in MSDataLoaderIter num_workers', self.num_workers)
         self.pin_memory = loader.pin_memory and torch.cuda.is_available()
         self.timeout = loader.timeout
 
@@ -166,4 +155,3 @@ class MSDataLoader(DataLoader):
 
     def __iter__(self):
         return _MSDataLoaderIter(self)
-

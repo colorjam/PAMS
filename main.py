@@ -14,9 +14,9 @@ from tqdm import tqdm
 import data
 import model
 import utility
-from model.edsr import PMAS_EDSR
+from model.edsr import PAMS_EDSR
 from model.edsr_org import EDSR
-from model.rdn import PMAS_RDN
+from model.rdn import PAMS_RDN
 from model.rdn_org import RDN
 from option import args
 from utils import common as util
@@ -214,30 +214,58 @@ class Trainer():
         else:
             return self.epoch >= self.args.epochs
 
+def load_check(checkpoint,model_s):
+    student_model_dict = model_s.state_dict()
+    teacher_pretrained_model = checkpoint
+    if teacher_pretrained_model:
+        teacher_model_key=[]
+        student_model_key=[]
+        for tkey in teacher_pretrained_model.keys():
+            teacher_model_key.append(tkey)
+        for skey in student_model_dict.keys():
+            if 'max_val' not in skey:
+                student_model_key.append(skey)
+        for i in range(len(student_model_key)):
+            if 'alpha' in student_model_key[i]:
+                temp_item = teacher_pretrained_model[teacher_model_key[i]].data.item()
+                temp = torch.ones(1)*temp_item
+                temp = temp.cuda()
+                student_model_dict[student_model_key[i]].data = temp.data
+            else:
+                student_model_dict[student_model_key[i]].data = teacher_pretrained_model[teacher_model_key[i]].data
+    return student_model_dict
+
 def main():
     import os
     if checkpoint.ok:
         loader = data.Data(args)
         if args.model.lower() == 'edsr':
             t_model = EDSR(args, is_teacher=True).to(device)
-            s_model = PMAS_EDSR(args, bias=True).to(device)
+            s_model = PAMS_EDSR(args, bias=True).to(device)
         elif args.model.lower() == 'rdn':
             t_model = RDN(args, is_teacher=True).to(device)
-            s_model = PMAS_RDN(args).to(device)
+            s_model = PAMS_RDN(args).to(device)
         else:
             raise ValueError('not expected model = {}'.format(args.model))
 
-        t_checkpoint = torch.load(args.pre_train) 
-        t_model.load_state_dict(t_checkpoint)
+        # t_checkpoint = torch.load(args.pre_train)
+        # t_model.load_state_dict(t_checkpoint)
         s_model_sd = s_model.state_dict()
         
         if args.test_only:
             if args.refine is not None:
                 ckpt = torch.load(f'{args.save}/model/model_best.pth.tar')
             else:
-                ckpt = torch.load(f'{args.refine}')
+                ckpt = torch.load(args.pre_train)
+                # s_checkpoint = ckpt['state_dict']
+                # state_dict = load_check(s_checkpoint, s_model)
+                # ckpt = state_dict
+            ckpt = torch.load(args.pre_train)
             s_checkpoint = ckpt['state_dict']
-            s_model.load_state_dict(s_checkpoint)
+            state_dict = load_check(s_checkpoint, s_model)
+            ckpt = state_dict
+            s_model.load_state_dict(ckpt)
+            torch.save(s_model.state_dict(), '/home/lihuixia/project/experiment/output/rdn_x4/model/8bit_rdn_x4.pt')
 
         t = Trainer(args, loader, t_model, s_model, checkpoint)
         

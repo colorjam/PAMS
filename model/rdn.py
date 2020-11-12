@@ -83,9 +83,9 @@ class PAMS_RDB(nn.Module):
     def name(self):
         return 'rdb'
 
-class PMAS_RDN(nn.Module):
+class PAMS_RDN(nn.Module):
     def __init__(self,args):
-        super(PMAS_RDN, self).__init__()
+        super(PAMS_RDN, self).__init__()
         r = args.scale[0]
         G0 = args.G0
         kSize = args.RDNkSize

@@ -148,7 +148,7 @@ class QuantConv2d(nn.Module):
     def forward(self, input, order=None):
         return nn.functional.conv2d(input, self.quant_weight(self.weight), self.bias, self.stride, self.padding, self.dilation, self.groups)
 
-def conv3x3(in_channels, out_channels,kernel_size=3,stride=1,padding =1,bias= False):
+def conv3x3(in_channels, out_channels,kernel_size=3,stride=1,padding =1,bias= True):
     return nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=padding, bias=bias)
 
 def quant_conv3x3(in_channels, out_channels,kernel_size=3,padding = 1,stride=1,k_bits=32,bias = False):
