@@ -19,7 +19,6 @@ class SRData(data.Dataset):
         self.do_eval = True
         self.benchmark = benchmark
         self.input_large = (args.model == 'VDSR')
-        # self.input_large = (False)
         self.scale = args.scale
         self.idx_scale = 0
         self._set_filesystem(args.dir_data)
@@ -27,7 +26,6 @@ class SRData(data.Dataset):
             path_bin = os.path.join(self.apath, 'bin')
             os.makedirs(path_bin, exist_ok=True)
 
-        # print('apath', self.apath)
         list_hr, list_lr = self._scan()
         if args.ext.find('img') >= 0 or benchmark:
             self.images_hr, self.images_lr = list_hr, list_lr

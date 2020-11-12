@@ -1,4 +1,3 @@
-VERSION=pams
 DATA_DIR=/media/disk2/sr_data
 
 edsr_x4() {
@@ -22,7 +21,11 @@ python3 main.py --scale 4 --model EDSR \
 # edsr_x4_eval 8 ./pretrained/8bit_edsr_x4.pt
 
 rdn_x4() {
+<<<<<<< HEAD
 python3 main.py --scale 4 --model RDN \
+=======
+python main.py --scale 4 \
+>>>>>>> 934208b41a1d16f6a6046bcc33bca80974957963
 --k_bits $1 --model RDN \
 --pre_train ./pretrained/rdn_baseline_x4.pt  --patch_size 96 \
 --data_test Set14 \

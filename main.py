@@ -147,7 +147,6 @@ class Trainer():
         for idx_data, d in enumerate(self.loader_test):
             for idx_scale, scale in enumerate(self.scale):
                 d.dataset.set_scale(idx_scale)
-                ssim_list = []
                 i = 0
                 for lr, hr, filename, _ in tqdm(d, ncols=80):
                     i += 1
@@ -236,7 +235,6 @@ def load_check(checkpoint,model_s):
     return student_model_dict
 
 def main():
-    import os
     if checkpoint.ok:
         loader = data.Data(args)
         if args.model.lower() == 'edsr':
@@ -248,14 +246,22 @@ def main():
         else:
             raise ValueError('not expected model = {}'.format(args.model))
 
+<<<<<<< HEAD
         # t_checkpoint = torch.load(args.pre_train)
         # t_model.load_state_dict(t_checkpoint)
         s_model_sd = s_model.state_dict()
+=======
+        if args.pre_train is not None:
+            t_checkpoint = torch.load(args.pre_train) 
+            t_model.load_state_dict(t_checkpoint)
+>>>>>>> 934208b41a1d16f6a6046bcc33bca80974957963
         
         if args.test_only:
-            if args.refine is not None:
+            if args.refine is None:
                 ckpt = torch.load(f'{args.save}/model/model_best.pth.tar')
+                refine_path = f'{args.save}/model/model_best.pth.tar'
             else:
+<<<<<<< HEAD
                 ckpt = torch.load(args.pre_train)
                 # s_checkpoint = ckpt['state_dict']
                 # state_dict = load_check(s_checkpoint, s_model)
@@ -266,6 +272,14 @@ def main():
             ckpt = state_dict
             s_model.load_state_dict(ckpt)
             torch.save(s_model.state_dict(), '/home/lihuixia/project/experiment/output/rdn_x4/model/8bit_rdn_x4.pt')
+=======
+                ckpt = torch.load(f'{args.refine}')
+                refine_path = args.refine
+
+            s_checkpoint = ckpt['state_dict']
+            s_model.load_state_dict(s_checkpoint)
+            print(f"Load model from {refine_path}")
+>>>>>>> 934208b41a1d16f6a6046bcc33bca80974957963
 
         t = Trainer(args, loader, t_model, s_model, checkpoint)
         
