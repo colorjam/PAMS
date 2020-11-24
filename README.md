@@ -1,8 +1,9 @@
 # PAMS: Quantized Super-Resolution via Parameterized Max Scale
 
 This resposity is the official implementation of our ECCV2020 [paper](https://arxiv.org/pdf/2011.04212.pdf).
-![The framework of our paper.]('./img/pams.pdf')
-Our implementation is based on [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch
+![The framework of our paper.]('./img/pams.png')
+
+Our implementation is based on [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch).
 ### Dependent
 * Python3**.6**
 * PyTorch == 1.1.0
