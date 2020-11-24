@@ -60,7 +60,7 @@ refer to `metrics/run.sh` for more details.
 |       |       | 4           | 27.536/0.7530 |
 
 ### Trained Models
-The trained models of getting our paper's results can be download by [Google Drive](https://drive.google.com/open?id=14p3ZBs8VQdHkMWBa5kv_qN7b0w2qJq6c)
+The trained models of getting our paper's results can be download by [Google Drive](https://drive.google.com/open?id=14p3ZBs8VQdHkMWBa5kv_qN7b0w2qJq6c). The pretrained EDSR (FP32) can be refered to [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch).
 
 ### Qualitative Results
 Some Qualitative Results of PAMS can be download by 
