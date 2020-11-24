@@ -1,11 +1,13 @@
 # PAMS: Quantized Super-Resolution via Parameterized Max Scale
 
-This resposity is the official implementation of our paper. Our implementation is based on [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch).
+This resposity is the official implementation of our [paper](https://arxiv.org/pdf/2011.04212.pdf)
+
+Our implementation is based on [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch).
 
 ### Dependencies
 * Python3.6
 * PyTorch == 1.1.0
-* Pytorch == 0.3.0
+* Pytorch == 
 * coloredlogs >= 14.0
 * scikit-image
 
@@ -48,24 +50,20 @@ matlab -nodesktop -nosplash -r "calculate_PSNR_SSIM('$dataset',$scale,$bit);quit
 refer to `metrics/run.sh` for more details.
 
 
-### Experiment Results
-
-| Model | Scale | bits        | PSNR(Set14)   |
-| ----- | ----- | ----------- | ------------- |
-| EDSR  | 4     | 32_backbone | 28.576/0.7813 |
-|       |       | 8           | 28.585/0.7811 |
-|       |       | 4           | 28.199/0.7725 |
-| RDN   | 4     | 32_backbone | 28.669/0.7838 |
-|       |       | 8           | 28.721/0.7848 |
-|       |       | 4           | 27.536/0.7530 |
-
 ### Trained Models
-The trained models of getting our paper's results can be download by [Google Drive](https://drive.google.com/open?id=14p3ZBs8VQdHkMWBa5kv_qN7b0w2qJq6c). The pretrained EDSR (FP32) can be refered to [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch).
+We also provide our baseline models below. Enjoy your training and testing!
+[Google Drive](https://drive.google.com/open?id=14p3ZBs8VQdHkMWBa5kv_qN7b0w2qJq6c).
 
-### Qualitative Results
-Some Qualitative Results of PAMS can be download by 
 
 ### Citations
 
 If our paper helps your research, please cite it in your publications:
-
+```
+@article{li2020pams,
+  title={PAMS: Quantized Super-Resolution via Parameterized Max Scale},
+  author={Li, Huixia and Yan, Chenqian and Lin, Shaohui and Zheng, Xiawu and Li, Yuchao and Zhang, Baochang and Yang, Fan and Ji, Rongrong},
+  journal={arXiv preprint arXiv:2011.04212},
+  year={2020},
+  publisher={Springer}
+}
+```

@@ -100,8 +100,6 @@ class Trainer():
             att_loss = args.w_at * util.at_loss(s_res, t_res)
 
             loss = nor_loss  + att_loss
-            # loss = nor_loss
-            # loss = att_loss
 
             loss.backward()
             self.optimizer.step()
@@ -132,7 +130,6 @@ class Trainer():
         torch.set_grad_enabled(False)
         epoch = self.epoch
         self.ckp.write_log('\nEvaluation:')
-        print(f'{args.save}')
         self.ckp.add_log(
             torch.zeros(1, len(self.loader_test), len(self.scale))
         )
@@ -246,40 +243,21 @@ def main():
         else:
             raise ValueError('not expected model = {}'.format(args.model))
 
-<<<<<<< HEAD
-        # t_checkpoint = torch.load(args.pre_train)
-        # t_model.load_state_dict(t_checkpoint)
-        s_model_sd = s_model.state_dict()
-=======
         if args.pre_train is not None:
             t_checkpoint = torch.load(args.pre_train) 
             t_model.load_state_dict(t_checkpoint)
->>>>>>> 934208b41a1d16f6a6046bcc33bca80974957963
         
         if args.test_only:
             if args.refine is None:
                 ckpt = torch.load(f'{args.save}/model/model_best.pth.tar')
                 refine_path = f'{args.save}/model/model_best.pth.tar'
             else:
-<<<<<<< HEAD
-                ckpt = torch.load(args.pre_train)
-                # s_checkpoint = ckpt['state_dict']
-                # state_dict = load_check(s_checkpoint, s_model)
-                # ckpt = state_dict
-            ckpt = torch.load(args.pre_train)
-            s_checkpoint = ckpt['state_dict']
-            state_dict = load_check(s_checkpoint, s_model)
-            ckpt = state_dict
-            s_model.load_state_dict(ckpt)
-            torch.save(s_model.state_dict(), '/home/lihuixia/project/experiment/output/rdn_x4/model/8bit_rdn_x4.pt')
-=======
                 ckpt = torch.load(f'{args.refine}')
                 refine_path = args.refine
 
             s_checkpoint = ckpt['state_dict']
             s_model.load_state_dict(s_checkpoint)
             print(f"Load model from {refine_path}")
->>>>>>> 934208b41a1d16f6a6046bcc33bca80974957963
 
         t = Trainer(args, loader, t_model, s_model, checkpoint)
         
