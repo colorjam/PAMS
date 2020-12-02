@@ -210,27 +210,6 @@ class Trainer():
         else:
             return self.epoch >= self.args.epochs
 
-def load_check(checkpoint,model_s):
-    student_model_dict = model_s.state_dict()
-    teacher_pretrained_model = checkpoint
-    if teacher_pretrained_model:
-        teacher_model_key=[]
-        student_model_key=[]
-        for tkey in teacher_pretrained_model.keys():
-            teacher_model_key.append(tkey)
-        for skey in student_model_dict.keys():
-            if 'max_val' not in skey:
-                student_model_key.append(skey)
-        for i in range(len(student_model_key)):
-            if 'alpha' in student_model_key[i]:
-                temp_item = teacher_pretrained_model[teacher_model_key[i]].data.item()
-                temp = torch.ones(1)*temp_item
-                temp = temp.cuda()
-                student_model_dict[student_model_key[i]].data = temp.data
-            else:
-                student_model_dict[student_model_key[i]].data = teacher_pretrained_model[teacher_model_key[i]].data
-    return student_model_dict
-
 def main():
     if checkpoint.ok:
         loader = data.Data(args)
@@ -255,7 +234,7 @@ def main():
                 ckpt = torch.load(f'{args.refine}')
                 refine_path = args.refine
 
-            s_checkpoint = ckpt['state_dict']
+            s_checkpoint = ckpt['state_dict'] if 'state_dict' in ckpt else ckpt
             s_model.load_state_dict(s_checkpoint)
             print(f"Load model from {refine_path}")
 
