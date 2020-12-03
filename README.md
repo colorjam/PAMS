@@ -5,9 +5,8 @@ This resposity is the official implementation of our ECCV2020 [paper](https://ar
 
 Our implementation is based on [EDSR(PyTorch)](https://github.com/thstkdgus35/EDSR-PyTorch).
 ### Dependent
-* Python3**.6**
+* Python 3.6
 * PyTorch == 1.1.0
-* Pytorch == 
 * coloredlogs >= 14.0
 * scikit-image
 
