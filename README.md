@@ -12,6 +12,14 @@ Our implementation is based on [EDSR(PyTorch)](https://github.com/thstkdgus35/ED
 
 ### Datasets
 Please download DIV2K datasets from [here](https://cv.snu.ac.kr/research/EDSR/DIV2K.tar) for training and [benchmark datasets](https://cv.snu.ac.kr/research/EDSR/benchmark.tar) for testing.
+Then, organise the dataset directory as follows:
+
+```
+datasets
+  benchmark
+  DIV2K
+```
+
 
 ### Usage
 
@@ -21,7 +29,7 @@ Please download DIV2K datasets from [here](https://cv.snu.ac.kr/research/EDSR/DI
 python main.py --scale 4 --k_bits 8 \
 --pre_train ../pretrained/edsr_baseline_x4.pt \
 --data_test Set14 --save edsr_x4/8bit/ \
---dir_data [DIR_DATA] --model EDSR               
+--dir_data ./datasets --model EDSR               
 ```
 
 * test
@@ -30,7 +38,7 @@ python main.py --scale 4 --k_bits 8 \
 python main.py --scale 4 --k_bits 8 \ 
 --pre_train ../pretrained/edsr_x4 --save_results \
 --data_test Set5+Set14+B100+Urban100 \
---save edsr_x4/8bit/ --dir_data [DIR_DATA]  
+--save edsr_x4/8bit/ --dir_data ./datasets  
 --test_only --refine [REFINE] --model EDSR 
 ```
 
