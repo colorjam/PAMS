@@ -20,7 +20,7 @@ from model.rdn import PAMS_RDN
 from model.rdn_org import RDN
 from option import args
 from utils import common as util
-from utils.common import AverageMeter
+from utils.common import AverageMeter, load_check
 
 torch.manual_seed(args.seed)
 checkpoint = utility.checkpoint(args)
@@ -225,7 +225,10 @@ def main():
         if args.pre_train is not None:
             t_checkpoint = torch.load(args.pre_train) 
             t_model.load_state_dict(t_checkpoint)
-        
+            
+            s_checkpoint = load_check(t_checkpoint, s_model)
+            s_model.load_state_dict(s_checkpoint)
+
         if args.test_only:
             if args.refine is None:
                 ckpt = torch.load(f'{args.save}/model/model_best.pth.tar')

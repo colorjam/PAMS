@@ -317,3 +317,28 @@ def save_checkpoint(state, is_best, checkpoint='checkpoint', filename='checkpoin
     torch.save(state, filepath)
     if is_best:
         shutil.copyfile(filepath, os.path.join(checkpoint, 'model_best.pth.tar'))
+
+
+def load_check(checkpoint, model):
+    student_model_dict = model.state_dict()
+    teacher_pretrained_model = checkpoint
+
+    if teacher_pretrained_model:
+        teacher_model_key=[]
+        student_model_key=[]
+
+        for tkey in teacher_pretrained_model.keys():
+            teacher_model_key.append(tkey)
+        
+        for skey in student_model_dict.keys():
+            if 'alpha' not in skey and 'max_val' not in skey:
+                student_model_key.append(skey)
+                
+        for temp in student_model_key:
+            if temp not in teacher_model_key:
+                print(f'Archive Keys {temp}')
+                
+        for i in range(len(student_model_key)):
+            student_model_dict[student_model_key[i]] = teacher_pretrained_model[teacher_model_key[i]]
+
+    return student_model_dict

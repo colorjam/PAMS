@@ -85,7 +85,6 @@ class PAMS_EDSR(nn.Module):
     def forward(self, x):
         x = self.sub_mean(x)
         x = self.head(x)
-        end = time.time()
         res = self.body(x)
         res += x
         out = res
